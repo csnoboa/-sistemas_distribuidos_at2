@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client</title>
+  </head>
+
+  <body>
+    <div id="signupdiv">
+      <h1>Login or Sign Up</h1>
+      <form>
+        <label for="username">Username</label>
+        <input type="text" id="username" /><br /><br />
+        <label for="username">Phone</label>
+        <input type="text" id="phone" /><br /><br />
+        <input type="button" value="Sign Up" onclick="signup()" />
+      </form>
+    </div>
+
+    <div id="contentdiv">
+      <script src="client.js"></script>
+      <h1>Logged as</h1>
+      <h3>Username:</h3>
+      <p id="loggedas"></p>
+      <h3>Phone:</h3>
+      <p id="loggedphone">Phone:</p>
+      <h1>Notifications</h1>
+      <div id="data"></div>
+      <h1>Show available offered rides</h1>
+      <button onclick="toggleRides()">Show</button>
+      <div id="rides_result" display="none">
+        <p id="response"></p>
+      </div>
+      <br />
+      <h1>Request or offer ride</h1>
+      <form>
+        <label for="from">From</label>
+        <input type="text" id="from" /><br /><br />
+        <label for="to">To</label>
+        <input type="text" id="to" /><br /><br />
+        <label for="date">Date</label>
+        <input type="text" id="date" /><br /><br />
+        <label for="passengers">Passengers</label>
+        <input type="text" id="passengers" /><br /><br />
+        <label for="offered">Is offered?</label>
+        <input type="checkbox" id="offered" name="scales" checked /><br /><br />
+        <input type="button" value="Submit" onclick="offer_or_want()" />
+      </form>
+      <br />
+      <h1>Cancel ride</h1>
+      <form>
+        <label for="cancel">Cancel ride id</label>
+        <input type="text" id="cancel" /><br /><br />
+        <input type="button" value="Submit" onclick="cancel_ride()" />
+      </form>
+    </div>
+  </body>
+</html>
