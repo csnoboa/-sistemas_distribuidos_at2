@@ -1,24 +1,11 @@
 from __future__ import print_function
-import Pyro5.api
 from data import Data
 from usuario import User
 from enquete import Enquete
 from threading import Thread
 import time
-from Crypto.Hash import SHA256
-from Crypto.PublicKey import RSA
-from Crypto.Signature import pss
-import base64
-import json
-import logging
-from apscheduler.schedulers.background import BackgroundScheduler
-import datetime
 
-from flask import Flask, request, render_template
 from flask_sse import sse
-from flask_cors import CORS
-from apscheduler.schedulers.background import BackgroundScheduler
-
 
 class Server():
     def __init__(self):
@@ -28,41 +15,27 @@ class Server():
         t = Thread(target=self.checar_enquetes_expiradas)
         t.start()
 
-    # Pega o objeto do cliente (para utilizar seus metodos)
-    def get_cliente_object(self, uri):
-        return Pyro5.api.Proxy(uri)
-
+    def notifica_clientes(self, mensagem, canal):
+        sse.publish({"message": mensagem}, type=canal)
+        pass
 
     # Cadastra o cliente como um Usuario
-    def cadastra_cliente(self, name, uri):
-        usuario = User(name, uri)
-        self.usuarios.append(usuario)
-        print("Usuario {0} foi cadastrado com sucesso.".format(usuario.name))
+    def cadastra_cliente(self, name):
+        self.usuarios.append(name)
+        self.notifica_clientes("usuario cadastrado: " + name, "usuarios")
+        print("Usuario {0} foi cadastrado com sucesso.".format(name))
 
     def cria_enquete(self, enquete_json):
         enquete = Enquete.criar_enquete_json(enquete_json)
         enquete.segundos = time.time()
         self.enquetes.append(enquete)
+
+        self.notifica_clientes("Nova enquete criada: " + enquete.titulo, "usuarios")
+
         print("A enquete {0} foi cadastrada por {1}.".format(enquete.titulo, enquete.usuario_criador))
-        # try:
-        #     threads = []
-        #     for u in self.usuarios:
-        #         t = Thread(target=self.notificar_usuarios_nova_enquete, args=(enquete, u))
-        #         t.start()
-        #         threads.append(t)
 
-        #     # Espera todas as threads para começar
-        #     for t in threads:
-        #         t.join()
-        # except:
-        #     print ("Error: unable to start thread")
 
-    # Notifica todos os usuarios cadastrados sobre nova enquete (menos o criador)
-    def notificar_usuarios_nova_enquete(self, enquete, user):
-        if user.name != enquete.usuario_criador:
-            datas = self.get_cliente_object(user.uri).votar(enquete.to_json())
-            if len(datas)>0:
-                self.receber_voto(user.name, enquete.titulo, datas)
+
 
     # Recebe o voto de um cliente em uma enquete - checha o dia e hora
     def receber_voto(self, name, titulo, datas_json):
@@ -100,20 +73,13 @@ class Server():
 
         for u in self.usuarios:
             for usuario_nome in enquete.usuarios_votantes:
-                if u.name == usuario_nome:
-                    self.get_cliente_object(u.uri).notificar_acabou(enquete.to_json())
-            if u.name == enquete.usuario_criador:
-                self.get_cliente_object(u.uri).notificar_acabou(enquete.to_json())
+                if u == usuario_nome:
+                    self.notifica_clientes(enquete.titulo, enquete.to_json())
+            if u == enquete.usuario_criador:
+                self.notifica_clientes(enquete.titulo, enquete.to_json())
 
     # Mostra uma enquete para um usuario, mas primeiro confere a assinatura
-    def ver_enquete(self, name, titulo, assinatura_digital, mensagem):
-        user = None
-        for u in self.usuarios:
-            if u.name == name:
-                user = u
-        result = self.autentifica(user, assinatura_digital, mensagem)
-        if result == 0:
-            return "Não autentificado"
+    def ver_enquete(self, name, titulo):
 
         for enquete in self.enquetes:
             if enquete.titulo == titulo:
@@ -132,41 +98,3 @@ class Server():
                 if (time.time() - enquete.segundos) > enquete.data_limite and enquete.status != "Encerrada":
                     self.notificar_usuarios_enquete_acabou(enquete)
             time.sleep(5)
-
-
-app = Flask(__name__)
-CORS(app)
-server = Server()
-
-@app.route("/ping")
-def home():
-    return "pong"
-
-@app.route("/cadastrar", methods=["POST"])
-def cadastrar():
-    user_json = json.loads(request.data)
-    server.cadastra_cliente(user_json["nome"], user_json["uri"])
-    return "Sucesso", 201
-
-@app.route("/list")
-def listar_usuarios():
-    usuarios_nomes = []
-    for u in server.usuarios:
-        usuarios_nomes.append(u.name)
-    return json.dumps(usuarios_nomes)
-
-@app.route("/cadastrar_enquete", methods=["POST"])
-def cadastrar_enquete():
-    enquete_json = json.loads(request.data)
-    server.cria_enquete(enquete_json)
-    return "Sucesso", 201
-
-@app.route("/list_enquetes")
-def listar_enquetes():
-    enquetes_json = []
-    for e in server.enquetes:
-        enquetes_json.append(e.to_json())
-    return json.dumps(enquetes_json)
-
-if __name__ == "__main__":
-    app.run(host="localhost", port=5000)

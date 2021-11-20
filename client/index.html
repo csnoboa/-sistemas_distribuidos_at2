@@ -8,47 +8,54 @@
 
   <body>
     <div id="signupdiv">
-      <h1>Login or Sign Up</h1>
+      <h1>Entre com o usuário</h1>
       <form>
-        <label for="username">Username</label>
-        <input type="text" id="username" /><br /><br />
-        <label for="username">Phone</label>
-        <input type="text" id="phone" /><br /><br />
-        <input type="button" value="Sign Up" onclick="signup()" />
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" /><br /><br />
+        <input type="button" value="Entrar" onclick="cadastrar()" />
       </form>
     </div>
 
     <div id="contentdiv">
       <script src="client.js"></script>
-      <h1>Logged as</h1>
-      <h3>Username:</h3>
+      <h1>Nome:</h1>
       <p id="loggedas"></p>
-      <h3>Phone:</h3>
-      <p id="loggedphone">Phone:</p>
       <h1>Notifications</h1>
-      <div id="data"></div>
-      <h1>Show available offered rides</h1>
+      <div id="notificacoes"></div>
+      <h1>Mostrar enquetes encerradas</h1>
       <button onclick="toggleRides()">Show</button>
       <div id="rides_result" display="none">
         <p id="response"></p>
       </div>
       <br />
-      <h1>Request or offer ride</h1>
+      <h1>Criar nova enquete</h1>
       <form>
-        <label for="from">From</label>
-        <input type="text" id="from" /><br /><br />
-        <label for="to">To</label>
-        <input type="text" id="to" /><br /><br />
-        <label for="date">Date</label>
-        <input type="text" id="date" /><br /><br />
-        <label for="passengers">Passengers</label>
-        <input type="text" id="passengers" /><br /><br />
-        <label for="offered">Is offered?</label>
-        <input type="checkbox" id="offered" name="scales" checked /><br /><br />
-        <input type="button" value="Submit" onclick="offer_or_want()" />
+        <label for="titulo">Titulo da enquete</label>
+        <input type="text" id="titulo" /><br /><br />
+        <label for="local">Local</label>
+        <input type="text" id="local" /><br /><br />
+
+        <label for="dia_data_1">Data 1 - Dia</label>
+        <input type="text" id="dia_data_1" /><br /><br />
+        <label for="horario_data_1">Data 1 - Horario</label>
+        <input type="text" id="horario_data_1" /><br /><br />
+
+        <label for="dia_data_2">Data 2 - Dia</label>
+        <input type="text" id="dia_data_2" /><br /><br />
+        <label for="horario_data_2">Data 2 - Horario</label>
+        <input type="text" id="horario_data_2" /><br /><br />
+
+        <label for="dia_data_3">Data 3 - Dia</label>
+        <input type="text" id="dia_data_3" /><br /><br />
+        <label for="horario_data_3">Data 3 - Horario</label>
+        <input type="text" id="horario_data_3" /><br /><br />
+
+        <label for="data_limite">Data limite</label>
+        <input type="text" id="data_limite" /><br /><br />
+        <input type="button" value="Submit" onclick="cadastrar_enquete()" />
       </form>
       <br />
-      <h1>Cancel ride</h1>
+      <h1>Votar em uma nova enquete</h1>
       <form>
         <label for="cancel">Cancel ride id</label>
         <input type="text" id="cancel" /><br /><br />
