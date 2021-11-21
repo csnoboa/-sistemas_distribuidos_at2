@@ -15,14 +15,14 @@ class Server():
         t = Thread(target=self.checar_enquetes_expiradas)
         t.start()
 
-    def notifica_clientes(self, mensagem, canal):
-        sse.publish({"message": mensagem}, type=canal)
+    def notifica_clientes(self, mensagem, canal, data):
+        sse.publish({"message": mensagem, "data": data}, type=canal)
         pass
 
     # Cadastra o cliente como um Usuario
     def cadastra_cliente(self, name):
         self.usuarios.append(name)
-        self.notifica_clientes("usuario cadastrado: " + name, "usuarios")
+        self.notifica_clientes("usuario cadastrado: " + name, "usuarios", None)
         print("Usuario {0} foi cadastrado com sucesso.".format(name))
 
     def cria_enquete(self, enquete_json):
@@ -30,11 +30,9 @@ class Server():
         enquete.segundos = time.time()
         self.enquetes.append(enquete)
 
-        self.notifica_clientes("Nova enquete criada: " + enquete.titulo, "usuarios")
+        self.notifica_clientes("Nova enquete criada: " + enquete.titulo, "usuarios", enquete_json)
 
         print("A enquete {0} foi cadastrada por {1}.".format(enquete.titulo, enquete.usuario_criador))
-
-
 
 
     # Recebe o voto de um cliente em uma enquete - checha o dia e hora
@@ -71,12 +69,7 @@ class Server():
         enquete.status = "Encerrada"
 
 
-        for u in self.usuarios:
-            for usuario_nome in enquete.usuarios_votantes:
-                if u == usuario_nome:
-                    self.notifica_clientes(enquete.titulo, enquete.to_json())
-            if u == enquete.usuario_criador:
-                self.notifica_clientes(enquete.titulo, enquete.to_json())
+        self.notifica_clientes("Enquete acabou: " + enquete.titulo, enquete.titulo, enquete.to_json())
 
     # Mostra uma enquete para um usuario, mas primeiro confere a assinatura
     def ver_enquete(self, name, titulo):
@@ -95,6 +88,6 @@ class Server():
     def checar_enquetes_expiradas(self):
         while True:
             for enquete in self.enquetes:
-                if (time.time() - enquete.segundos) > enquete.data_limite and enquete.status != "Encerrada":
+                if (time.time() - enquete.segundos) > int(enquete.data_limite) and enquete.status != "Encerrada":
                     self.notificar_usuarios_enquete_acabou(enquete)
             time.sleep(5)

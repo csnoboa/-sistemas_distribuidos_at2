@@ -55,12 +55,18 @@
         <input type="button" value="Submit" onclick="cadastrar_enquete()" />
       </form>
       <br />
-      <h1>Votar em uma nova enquete</h1>
-      <form>
-        <label for="cancel">Cancel ride id</label>
-        <input type="text" id="cancel" /><br /><br />
-        <input type="button" value="Submit" onclick="cancel_ride()" />
-      </form>
+      <div id="votar_enquete">
+        <h1 id="votar_enquete_titulo">Votar em uma nova enquete: </h1>
+        <form>
+          <input type="checkbox" id="data1_check" name="data1" value="0">
+          <label id="data1"></label>
+          <input type="checkbox" id="data2_check" name="data2" value="1">
+          <label id="data2"></label>
+          <input type="checkbox" id="data3_check" name="data3" value="2">
+          <label id="data3"></label>
+          <input type="button" value="Submit" onclick="votar_enquete()" />
+        </form>
+      </div>
     </div>
   </body>
 </html>

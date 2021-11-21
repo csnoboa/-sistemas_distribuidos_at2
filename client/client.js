@@ -2,104 +2,12 @@
 
 window.onload = () => {
     console.log("window loaded");
-    document.getElementById("rides_result").style.display = "none";
     document.getElementById("signupdiv").style.display = "block";
     document.getElementById("contentdiv").style.display = "none";
+    document.getElementById("votar_enquete").style.display = "none";
   };
 
-  function toggleRides() {
-    var x = document.getElementById("rides_result");
-    if (x.style.display === "none") {
-      get_rides();
-      x.style.display = "block";
-    } else {
-      x.style.display = "none";
-    }
-  }
 
-  function offer_or_want() {
-    var is_offered = document.getElementById("offered").checked;
-    var from = document.getElementById("from").value;
-    var to = document.getElementById("to").value;
-    var date = document.getElementById("date").value;
-    var passengers = document.getElementById("passengers").value;
-    var username = document.getElementById("username").value;
-
-    ride = {
-      location: [from, to],
-      date: date,
-      passengers: passengers,
-      user: username,
-      offered: is_offered,
-    };
-
-    fetch("http://localhost:5000/offer_or_want_ride", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(ride),
-    })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-
-    clear_all();
-  }
-
-  function clear_all() {
-    document.getElementById("offered").checked == false;
-    document.getElementById("from").value = "";
-    document.getElementById("to").value = "";
-    document.getElementById("date").value = "";
-    document.getElementById("passengers").value = "";
-    document.getElementById("cancel").value = "";
-  }
-
-  function get_rides() {
-    fetch("http://localhost:5000/get_rides", {
-      method: "GET",
-      headers: {},
-    })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (ride_list) {
-        var targetContainer = document.getElementById("response");
-        response_json =
-          "<pre>" + JSON.stringify(ride_list, undefined, 2) + "</pre>";
-
-        targetContainer.innerHTML = response_json;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-
-    clear_all();
-  }
-
-  function cancel_ride() {
-    var ride_id_to_cancel = document.getElementById("cancel").value;
-
-    fetch("http://localhost:5000/cancel_ride", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: String(ride_id_to_cancel),
-    })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-
-    clear_all();
-  }
 
   function cadastrar_enquete() {
     var titulo = document.getElementById("titulo").value;
@@ -152,6 +60,22 @@ window.onload = () => {
         body: JSON.stringify(data)
       })
 
+      document.getElementById("titulo").value == "";
+      document.getElementById("local").value = "";
+      document.getElementById("dia_data_1").value = "";
+      document.getElementById("horario_data_1").value = "";
+      document.getElementById("dia_data_2").value = "";
+      document.getElementById("horario_data_2").value = "";
+      document.getElementById("dia_data_3").value = "";
+      document.getElementById("horario_data_3").value = "";
+      document.getElementById("data_limite").value = "";
+
+  }
+
+  function votar_enquete() {
+
+    document.getElementById("votar_enquete").style.display = "none";
+
   }
 
   function cadastrar() {
@@ -176,7 +100,19 @@ window.onload = () => {
     source.addEventListener('usuarios', function(event) {
         var data = JSON.parse(event.data);
         console.log("The server says " + data.message);
-        document.getElementById("notificacoes").innerHTML += event.data + "<br>";
+        document.getElementById("notificacoes").innerHTML += data.message + "<br>";
+        if (data.message.includes("Nova enquete criada:"))
+        {
+          document.getElementById("votar_enquete_titulo").innerHTML += data.data.titulo + "  Local: " + data.data.local;
+
+          datas = data.data.datas;
+          console.log(datas)
+          document.getElementById("votar_enquete").style.display = "block";
+          document.getElementById("data1").innerHTML = "Data1:  Dia = " + datas[0].dia + "    Horario = " + datas[0].horario + " <br>";
+          document.getElementById("data2").innerHTML = "Data2:  Dia = " + datas[1].dia + "    Horario = " + datas[1].horario + " <br>";
+          document.getElementById("data3").innerHTML = "Data3:  Dia = " + datas[2].dia + "    Horario = " + datas[2].horario + " <br>";
+
+        }
     }, false);
     source.addEventListener('error', function(event) {
         console.log("Error"+ event)
