@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Client</title>
+    <title>Usuario</title>
   </head>
 
   <body>
@@ -19,16 +19,17 @@
     <div id="contentdiv">
       <script src="client.js"></script>
       <h1>Nome:</h1>
-      <p id="loggedas"></p>
-      <h1>Notifications</h1>
+      <p id="usuario_cadastrado"></p>
+      <h1>Notificações:</h1>
       <div id="notificacoes"></div>
-      <h1>Mostrar enquetes encerradas</h1>
-      <button onclick="toggleRides()">Show</button>
-      <div id="rides_result" display="none">
-        <p id="response"></p>
+      <div id="enquete_encerrada">
+        <h1 id="enquete_encerrada_header"></h1>
+          <p id="local_encerrado"></p>
+          <p id="data_encerrado"></p>
       </div>
+
       <br />
-      <h1>Criar nova enquete</h1>
+      <h1>Criar nova enquete:</h1>
       <form>
         <label for="titulo">Titulo da enquete</label>
         <input type="text" id="titulo" /><br /><br />
@@ -56,7 +57,7 @@
       </form>
       <br />
       <div id="votar_enquete">
-        <h1 id="votar_enquete_titulo">Votar em uma nova enquete: </h1>
+        <h1 id="votar_enquete_titulo"></h1>
         <form>
           <input type="checkbox" id="data1_check" name="data1" value="0">
           <label id="data1"></label>
@@ -67,6 +68,9 @@
           <input type="button" value="Submit" onclick="votar_enquete()" />
         </form>
       </div>
+      <h1>Mostrar enquetes encerradas</h1>
+      <button onclick="listar_enquetes()">Listar</button>
+        <p id="enquetes_listadas"></p>
     </div>
   </body>
 </html>
